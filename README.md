@@ -6,7 +6,6 @@ Example SuperchainERC20 token (contract + frontend) implementation. The frontend
 
 <img width="1580" alt="Screenshot 2025-02-18 at 9 12 01 PM" src="https://github.com/user-attachments/assets/b891cd06-04d0-4a3a-ae78-2dcce569b3cc" />
 
-
 ## 🔗 Contracts
 
 ### [CrossChainMultisend.sol](./contracts/src/CrossChainMultisend.sol)
@@ -182,8 +181,13 @@ Start building on the Superchain!
 
 ## 📚 More examples, docs
 
-- Interop recipies / guides: https://docs.optimism.io/app-developers/tutorials/interop
+- Interop recipes / guides: https://docs.optimism.io/app-developers/tutorials/interop
 - Superchain Dev Console: https://console.optimism.io/
+
+### Examples
+
+- [Crosschain Flash Loan](https://github.com/ethereum-optimism/superchain-starter-xchain-flash-loan-example)
+- [Multisend](https://github.com/ethereum-optimism/superchain-starter-multisend)
 
 ## ⚖️ License
 

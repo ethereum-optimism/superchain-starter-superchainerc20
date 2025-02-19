@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@9.0.2",
   "scripts": {
     "dev": "mprocs",
     "dev:frontend": "vite",
