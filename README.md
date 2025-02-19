@@ -4,6 +4,9 @@
 
 Example SuperchainERC20 token (contract + frontend) implementation. The frontend includes a simple bridge interface & event log viewer to see the flow funds.
 
+<img width="1580" alt="Screenshot 2025-02-18 at 9 12 01 PM" src="https://github.com/user-attachments/assets/b891cd06-04d0-4a3a-ae78-2dcce569b3cc" />
+
+
 ## 🔗 Contracts
 
 ### [CrossChainMultisend.sol](./contracts/src/CrossChainMultisend.sol)
