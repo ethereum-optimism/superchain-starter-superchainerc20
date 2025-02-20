@@ -6,6 +6,14 @@ Example SuperchainERC20 token (contract + frontend) implementation. The frontend
 
 <img width="1580" alt="Screenshot 2025-02-18 at 9 12 01 PM" src="https://github.com/user-attachments/assets/b891cd06-04d0-4a3a-ae78-2dcce569b3cc" />
 
+## 📝 Overview
+
+InitialSupplySuperchainERC20 is a SuperchainERC20-compatible token that implements a "home chain" minting model. The contract:
+
+1. Mints the entire token supply once on a designated "home chain"
+2. Can be deployed across multiple chains at the same address
+3. Allows tokens to be bridged between chains using standard SuperchainERC20 mechanisms
+
 ## 🔗 Contracts
 
 ### [InitialSupplySuperchainERC20.sol](./contracts/src/InitialSupplySuperchainERC20.sol)
@@ -15,13 +23,58 @@ Example SuperchainERC20 token (contract + frontend) implementation. The frontend
 - Mints initial supply to the owner on a "home chain"
 - Contract can be deployed to other chains on the same address, but no new liquidity will be minted
 
-## 📝 Overview
+## 🚀 Getting started
 
-InitialSupplySuperchainERC20 is a SuperchainERC20-compatible token that implements a "home chain" minting model. The contract:
+### Prerequisites: Foundry & Node
 
-1. Mints the entire token supply once on a designated "home chain"
-2. Can be deployed across multiple chains at the same address
-3. Allows tokens to be bridged between chains using standard SuperchainERC20 mechanisms
+Follow [this guide](https://book.getfoundry.sh/getting-started/installation) to install Foundry
+
+### 1. Create a new repository using this template:
+
+Click the "Use this template" button above on GitHub, or [generate directly](https://github.com/new?template_name=superchain-starter&template_owner=ethereum-optimism)
+
+### 2. Clone your new repository
+
+```bash
+git clone <your-new-repository-url>
+cd superchain-starter-initial-supply-token
+```
+
+### 3. Install dependencies
+
+```bash
+pnpm i
+```
+
+### 4. Get started
+
+```bash
+pnpm dev
+```
+
+This command will:
+
+- Start a local Superchain network (1 L1 chain and 2 L2 chains) using [supersim](https://github.com/ethereum-optimism/supersim)
+- Launch the frontend development server at (http://localhost:5173)
+- Deploy the tokens all of the L2 chains in the local network
+
+Start building on the Superchain!
+
+
+## 🤔 What is SuperchainERC20?
+
+`SuperchainERC20` is an implementation of [ERC-7802](https://ethereum-magicians.org/t/erc-7802-crosschain-token-interface/21508) designed to enable asset interoperability in the Superchain.
+`SuperchainERC20` tokens are fungible across the Superchain by giving the `SuperchainERC20Bridge` permission to mint and burn the token during cross-chain transfers. For more information on SuperchainERC20 please visit the [docs](https://docs.optimism.io/stack/interop/superchain-erc20).
+
+**Note**: ERC20 tokens that do not utilize the `SuperchainERC20Bridge` for cross-chain transfers can still achieve fungibility across the Superchain through interop message passing with a custom bridge solution. For these custom tokens, implementing [ERC-7802](https://ethereum-magicians.org/t/erc-7802-crosschain-token-interface/21508) is strongly recommended, as it unifies cross-chain mint and burn interfaces, enabling tokens to benefit from a standardized approach to cross-chain transfers.
+
+### `IERC7802`
+
+To achieve cross-chain functionality, the `SuperchainERC20` standard incorporates the `IERC7802` interface, defining essential functions and events:
+
+- **`crosschainMint`**: Mints tokens on the destination chain as part of a cross-chain transfer.
+- **`crosschainBurn`**: Burns tokens on the source chain to facilitate the transfer.
+- **Events (`CrosschainMint` and `CrosschainBurn`)**: Emit when tokens are minted or burned, enabling transparent tracking of cross-chain transactions.
 
 ## 🎯 Patterns
 
@@ -142,42 +195,99 @@ The SuperchainERC20 implementation guards the `crosschainMint` and `crosschainBu
 require(msg.sender == PredeployAddresses.SUPERCHAIN_TOKEN_BRIDGE, "Unauthorized");
 ```
 
-## 🚀 Getting started
+## Guides
 
-### Prerequisites: Foundry & Node
 
-Follow [this guide](https://book.getfoundry.sh/getting-started/installation) to install Foundry
+### Updating an ERC20 contract to be interoperable
 
-### 1. Create a new repository using this template:
+This section explains how to modify an existing `ERC20` contract to make it interoperable within the Superchain.
 
-Click the "Use this template" button above on GitHub, or [generate directly](https://github.com/new?template_name=superchain-starter&template_owner=ethereum-optimism)
+In this example, we will update the [GovernanceToken](https://github.com/ethereum-optimism/optimism/blob/80465cd6c428d13166fce351741492f354621643/packages/contracts-bedrock/src/governance/GovernanceToken.sol) `ERC20` to make it interoperable. To do this we just need to implement the [IERC7802](https://ethereum-magicians.org/t/erc-7802-crosschain-token-interface/21508) interface.
 
-### 2. Clone your new repository
+**Note:** The `IERC7802` interface is designed to be **minimal** and only specifies the required function signatures (`crosschainMint` and `crosschainBurn`) and events (`CrosschainMint` and `CrosschainBurn`). **Developers have complete control over how these functions are implemented**, including the logic for handling cross-chain minting and burning. This allows flexibility to tailor the behavior to specific use cases or custom bridge solutions. In the example below we show how this interface is implemented for an example token that uses the [`SuperchainTokenBridge`](https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/L2/SuperchainTokenBridge.sol) for cross-chain minting and burning.
 
-```bash
-git clone <your-new-repository-url>
-cd superchain-starter-initial-supply-token
+**1. Add the IERC7802 interface to the contract**
+
+Import the `IERC7802` and update your contract to inherit from it.
+
+```solidity
+import { IERC7802 } from "@contracts-bedrock/L2/interfaces/IERC7802.sol";
+
+contract GovernanceToken is IERC7802, ERC20Burnable, ERC20Votes, Ownable {
+    // Contract implementation here
+}
 ```
 
-### 3. Install dependencies
+**2. Add the `crosschainMint` function to the contract**
 
-```bash
-pnpm i
+The `crosschainMint` function defines how tokens are minted on the destination chain during a cross-chain transfer. While the interface requires the function's signature, **the implementation is entirely up to you.**
+
+In this example, only the `SuperchainTokenBridge` contract will have permissions to mint the token during a crosschain transfer. If you’re using a custom bridge, you could replace `SuperchainTokenBridge` with your bridge contract and implement the desired logic. You can customize this function to add any logic or access control as needed.
+
+```solidity
+/// @notice Allows the SuperchainTokenBridge to mint tokens.
+/// @param _to     Address to mint tokens to.
+/// @param _amount Amount of tokens to mint.
+function crosschainMint(address _to, uint256 _amount) external {
+    // Only the `SuperchainTokenBridge` has permissions to mint tokens during crosschain transfers.
+    if (msg.sender != Predeploys.SUPERCHAIN_TOKEN_BRIDGE) revert Unauthorized();
+
+    // Mint tokens to the `_to` account's balance.
+    _mint(_to, _amount);
+
+    // Emit the CrosschainMint event included on IERC7802 for tracking token mints associated with cross chain transfers.
+    emit CrosschainMint(_to, _amount, msg.sender);
+}
 ```
 
-### 4. Get started
+**3. Add the `crosschainBurn` function to the contract**
+The `crosschainBurn` function defines how tokens are burned on the source chain during a cross-chain transfer. Again, while the interface specifies the function signature, **the implementation is completely flexible.**
 
-```bash
-pnpm dev
+In this example, only the `SuperchainTokenBridge` contract will have permissions to burn the token during a crosschain transfer. However, you can modify this to fit your requirements.
+
+```solidity
+/// @notice Allows the SuperchainTokenBridge to burn tokens.
+/// @param _from   Address to burn tokens from.
+/// @param _amount Amount of tokens to burn.
+function crosschainBurn(address _from, uint256 _amount) external {
+    // Only the `SuperchainTokenBridge` has permissions to burn tokens during crosschain transfers.
+    if (msg.sender != Predeploys.SUPERCHAIN_TOKEN_BRIDGE) revert Unauthorized();
+
+    // Burn the tokens from the `_from` account's balance.
+    _burn(_from, _amount);
+
+    // Emit the CrosschainBurn event included on IERC7802 for tracking token burns associated with cross chain transfers.
+    emit CrosschainBurn(_from, _amount, msg.sender);
+}
 ```
 
-This command will:
+**4. Add the `supportsInterface` function to the contract**
 
-- Start a local Superchain network (1 L1 chain and 2 L2 chains) using [supersim](https://github.com/ethereum-optimism/supersim)
-- Launch the frontend development server at (http://localhost:5173)
-- Deploy the tokens all of the L2 chains in the local network
+Since `IERC7802` is an extension of [IERC165](https://eips.ethereum.org/EIPS/eip-165), your contract must implement the `supportsInterface` function to indicate which interfaces it supports.
 
-Start building on the Superchain!
+In this example our token supports `IERC7802`, `IERC20`, and `IERC165`
+
+```solidity
+/// @notice Query if a contract implements an interface
+/// @param interfaceID The interface identifier, as specified in ERC-165
+/// @dev Interface identification is specified in ERC-165. This function
+/// uses less than 30,000 gas.
+/// @return `true` if the contract implements `interfaceID` and
+/// `interfaceID` is not 0xffffffff, `false` otherwise
+function supportsInterface(bytes4 _interfaceId) public view virtual returns (bool) {
+    return _interfaceId == type(IERC7802).interfaceId || _interfaceId == type(IERC20).interfaceId
+        || _interfaceId == type(IERC165).interfaceId;
+}
+```
+
+After following these four steps your token is ready to be interoperable! The full example contract is available [here](packages/contracts/examples/L2NativeInteroperableGovernanceToken.sol).
+
+This example showcases that the `IERC7802` interface does not enforce any specific logic for handling cross-chain minting and burning. It only ensures that the required functions and events exist, leaving all implementation details entirely up to you. You can:
+
+- Use any custom access control mechanisms for `crosschainMint` and `crosschainBurn`.
+- Implement specific checks, restrictions, or business logic tailored to your token's requirements.
+- Integrate the interface with your own bridge or use it with the `SuperchainTokenBridge`.
+
 
 ## 📚 More examples, docs
 
