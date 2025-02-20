@@ -8,7 +8,7 @@ Example SuperchainERC20 token (contract + frontend) implementation. The frontend
 
 ## 🔗 Contracts
 
-### [CrossChainMultisend.sol](./contracts/src/CrossChainMultisend.sol)
+### [InitialSupplySuperchainERC20.sol](./contracts/src/InitialSupplySuperchainERC20.sol)
 
 - An implementation of [SuperchainERC20](https://specs.optimism.io/interop/token-bridging.html#superchainerc20-standard)
 - Uses a solady implementation of the token
