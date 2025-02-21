@@ -1,6 +1,8 @@
 # Superchain Starter Kit: InitialSupplySuperchainERC20
 
 > Generated from [superchain-starter](https://github.com/ethereum-optimism/superchain-starter). See the original repository for a more detailed development guide.
+> 
+> SuperchainERC20s can be deployed on any chain, but will only be interoperable within the [Superchain interop cluster](https://docs.optimism.io/stack/interop/explainer#superchain-interop-cluster).
 
 Example SuperchainERC20 token (contract + frontend) implementation. The frontend includes a simple bridge interface & event log viewer to see the flow funds.
 
