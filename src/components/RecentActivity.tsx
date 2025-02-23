@@ -1,9 +1,11 @@
 import { Card } from '@/components/ui/card';
 import { useIndexerStore } from '@/lib/indexer';
-import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, CopyIcon } from 'lucide-react';
 import { zeroAddress, formatUnits } from 'viem';
 import { network } from '@/config';
 import { useTokenInfo } from '@/lib/useTokenInfo';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 // Simple utility function
 const formatAddress = (address: string) => {
@@ -69,10 +71,21 @@ export const RecentActivity = () => {
                         ? `From: ${formatAddress(transfer.from)}`
                         : `${formatAddress(transfer.from)} → ${formatAddress(transfer.to)}`}
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
                     {network.chains.find(chain => chain.id === transfer.chainId)?.name ||
                       'Unknown Chain'}{' '}
-                    • Block #{transfer.blockNumber.toString()}
+                    • Block #{transfer.blockNumber.toString()}• Tx: {formatAddress(transfer.txHash)}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-4 w-4 p-0"
+                      onClick={() => {
+                        navigator.clipboard.writeText(transfer.txHash);
+                        toast.success('Transaction hash copied to clipboard');
+                      }}
+                    >
+                      <CopyIcon className="h-3 w-3" />
+                    </Button>
                   </div>
                 </div>
               </div>

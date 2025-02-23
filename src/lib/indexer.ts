@@ -1,4 +1,4 @@
-import { Address, parseAbiItem, PublicClient } from 'viem';
+import { Address, Hash, parseAbiItem, PublicClient } from 'viem';
 import { create } from 'zustand';
 import { parseJson, serializeJson } from '@/lib/json';
 
@@ -10,6 +10,7 @@ interface ChainTransfer {
   to: string;
   value: bigint;
   blockNumber: bigint;
+  txHash: Hash;
 }
 
 interface BalanceMap {
@@ -282,6 +283,7 @@ export const createIndexer = (
             to: log.args.to as string,
             value: log.args.value as bigint,
             blockNumber: log.blockNumber!,
+            txHash: log.transactionHash,
           };
           useIndexerStore.getState().addTransfer(transfer);
         });
@@ -328,6 +330,7 @@ export const createIndexer = (
             to: log.args.to as string,
             value: log.args.value as bigint,
             blockNumber: log.blockNumber!,
+            txHash: log.transactionHash,
           };
           useIndexerStore.getState().addTransfer(transfer);
         });
