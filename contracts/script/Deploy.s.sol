@@ -6,11 +6,7 @@ import {Vm} from "forge-std/Vm.sol";
 import {ICreateX} from "createx/ICreateX.sol";
 
 import {DeployUtils} from "../libraries/DeployUtils.sol";
-<<<<<<< HEAD
 import {InitialSupplySuperchainERC20} from "../src/InitialSupplySuperchainERC20.sol";
-=======
-import {CrossChainCounter} from "../src/CrossChainCounter.sol";
->>>>>>> upstream/main
 
 // Example forge script for deploying as an alternative to sup: super-cli (https://github.com/ethereum-optimism/super-cli)
 contract Deploy is Script {
@@ -30,7 +26,6 @@ contract Deploy is Script {
 
             console.log("Deploying to RPC: ", rpcUrl);
             vm.createSelectFork(rpcUrl);
-<<<<<<< HEAD
             deployInitialSupplySuperchainERC20Contract();
         }
     }
@@ -41,15 +36,6 @@ contract Deploy is Script {
             abi.encode(msg.sender, "Test", "TEST", 18, 1000, block.chainid)
         );
         addr_ = DeployUtils.deployContract("InitialSupplySuperchainERC20", _implSalt(), initCode);
-=======
-            deployCrossChainCounterContract();
-        }
-    }
-
-    function deployCrossChainCounterContract() public broadcast returns (address addr_) {
-        bytes memory initCode = abi.encodePacked(type(CrossChainCounter).creationCode);
-        addr_ = DeployUtils.deployContract("CrossChainCounter", _implSalt(), initCode);
->>>>>>> upstream/main
     }
 
     /// @notice The CREATE2 salt to be used when deploying a contract.
