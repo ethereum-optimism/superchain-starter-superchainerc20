@@ -291,6 +291,17 @@ This example showcases that the `IERC7802` interface does not enforce any specif
 - Integrate the interface with your own bridge or use it with the `SuperchainTokenBridge`.
 
 
+## 🐛 Debugging
+
+Use the error selectors below to identify the cause of reverts.
+
+- For a complete list of error signatures from interoperability contracts, see [abi-signatures.md](https://github.com/ethereum-optimism/ecosystem/blob/main/packages/viem/docs/abi-signatures.md)
+- Examples:
+  - `TargetCallFailed()`: `0xeda86850`
+  - `MessageAlreadyRelayed`: `0x9ca9480b`
+  - `Unauthorized()`: `0x82b42900`
+ 
+ 
 ## 📚 More resources
 
 - Interop recipes / guides: https://docs.optimism.io/app-developers/tutorials/interop
