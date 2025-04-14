@@ -3,7 +3,7 @@ import { Network, supersimNetwork } from '@/networks';
 import { Chain } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-export const tokenAddress = '0x511788d684a6b91b0ab0a19c898ce2d7b65f1fa9' as const;
+export const tokenAddress = '0xd74c07fa0b3801104a016434d9cd622fe7249d4d' as const;
 
 // Also assumed to be the owner of the token, owning the entire supply
 export const defaultAccount = privateKeyToAccount(

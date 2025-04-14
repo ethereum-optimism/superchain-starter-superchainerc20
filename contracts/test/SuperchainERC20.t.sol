@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.25;
+pragma solidity 0.8.25;
 
 // Testing utilities
 import {Test} from "forge-std/Test.sol";
@@ -7,6 +7,7 @@ import {Test} from "forge-std/Test.sol";
 // Libraries
 import {PredeployAddresses} from "@interop-lib/libraries/PredeployAddresses.sol";
 import {IERC20} from "@openzeppelin/contracts/interfaces/IERC20.sol";
+import {Unauthorized} from "@interop-lib/libraries/errors/CommonErrors.sol";
 
 // Target contract
 import {SuperchainERC20} from "@interop-lib/SuperchainERC20.sol";
@@ -42,7 +43,7 @@ contract SuperchainERC20Test is Test {
         vm.assume(_caller != SUPERCHAIN_TOKEN_BRIDGE);
 
         // Expect the revert with `Unauthorized` selector
-        vm.expectRevert("Unauthorized");
+        vm.expectRevert(Unauthorized.selector);
 
         // Call the `mint` function with the non-bridge caller
         vm.prank(_caller);
@@ -82,7 +83,7 @@ contract SuperchainERC20Test is Test {
         vm.assume(_caller != SUPERCHAIN_TOKEN_BRIDGE);
 
         // Expect the revert with `Unauthorized` selector
-        vm.expectRevert("Unauthorized");
+        vm.expectRevert(Unauthorized.selector);
 
         // Call the `burn` function with the non-bridge caller
         vm.prank(_caller);
